@@ -50,7 +50,7 @@ To get started with the Google Drive Manager, follow these steps:
 3. Clone the Repository: Clone this repository to your local machine:
 
 ```shell
-git clone https://github.com/thedev-junyoung/google-drive.git
+git clone https://github.com/thedev-junyoung/GoogleDrivePyManager.git
 ```
 4. Set Up Environment Variables: Create a .env file in the root directory of the project and define the following variables:
 ```makefile
@@ -155,7 +155,7 @@ manager.export_file('your-google-docs-file-id')
     ```
 3. **저장소 클론**: 이 저장소를 로컬 머신으로 클론하세요:
     ```
-    git clone https://github.com/thedev-junyoung/google-drive.git
+    git clone https://github.com/thedev-junyoung/GoogleDrivePyManager.git
     ```
 4. **환경 변수 설정**: 프로젝트의 루트 디렉토리에 `.env` 파일을 생성하고 다음 변수를 정의하세요:
     
