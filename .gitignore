@@ -1,9 +1,5 @@
 venv
 credential-google.json
-create-directory.py
-create-share-folder.py
-delete.py
-lawbot.png
 trash
 asset
 token.json
