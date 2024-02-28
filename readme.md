@@ -87,6 +87,15 @@ manager.search_file(folder_id)
 manager.export_file('your-google-docs-file-id')
 ```
 
+## References
+
+- Google Drive API Documentation: 
+    - https://developers.google.com/drive
+    - https://developers.google.com/drive/api/guides/about-sdk
+    - https://developers.google.com/drive/api/quickstart/python
+    - https://developers.google.com/drive/api/guides/about-files
+    - ...
+
 
 
 
@@ -181,3 +190,13 @@ manager.search_file(folder_id)
 # 구글 워크스페이스 문서 내보내기 
 manager.export_file('your-google-docs-file-id')
 ```
+
+
+## 참고 자료
+
+- 구글 드라이브 API 문서: 
+    - https://developers.google.com/drive
+    - https://developers.google.com/drive/api/guides/about-sdk
+    - https://developers.google.com/drive/api/quickstart/python
+    - https://developers.google.com/drive/api/guides/about-files
+    - ...
