@@ -24,6 +24,8 @@
 </body>
 </html>
 
+---
+
 # English Version
 Google Drive Manager
 The Google Drive Manager is a Python class designed to simplify interactions with the Google Drive API, enabling easy file and folder management within Google Drive.
