@@ -3,7 +3,7 @@ import io
 import mimetypes
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseUpload
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.exceptions import RefreshError
@@ -79,34 +79,41 @@ class GoogleDriveManager:
     # ref: 
     # - https://developers.google.com/drive/api/guides/manage-uploads
     # - https://developers.google.com/drive/api/guides/manage-sharing // share
-    def upload_file(self, file_path, folder_id):
-        """
-        Upload a file to Google Drive.
-        파일을 구글 드라이브에 업로드합니다.
-        
-        Args:
-            file_path (str): The local path of the file to upload.
-            업로드할 파일의 로컬 경로입니다.
-            folder_id (str): The ID of the folder to upload the file into.
-            파일을 업로드할 폴더의 ID입니다.
-        
-        Returns:
-            str: The ID of the uploaded file.
-            업로드된 파일의 ID입니다.
-        """
-        service = self.create_service()
-        mime_type, _ = mimetypes.guess_type(file_path)
-        if mime_type is None:
-            mime_type = 'application/octet-stream'
-        file_metadata = {'name': os.path.basename(file_path), 'parents': [folder_id]}
-        media = MediaFileUpload(file_path, mimetype=mime_type, resumable=True)
-        try:
-            file = service.files().create(body=file_metadata, media_body=media, fields='id', supportsAllDrives=True).execute()
-            print(f'File ID: {file.get("id")}')
-            return file.get('id')
-        except HttpError as error:
-            print(f'An error occurred: {error}')
-            return None
+    def upload_file(self, file_stream_or_path, file_name, folder_id):
+            """
+            파일 또는 파일 스트림을 Google 드라이브에 업로드
+            Args:
+                file_stream_or_path : 업로드 할 파일 스트림 또는 파일 경로.
+                file_name (str) : 업로드 할 파일의 이름입니다.
+                folder_id (str) : 폴더의 ID로 파일을 업로드 할 수 있습니다.
+            Returns:
+                str: 업로드 된 파일의 ID.
+            """
+            service = self.create_service()
+
+            # 파일 경로로부터 업로드하는 경우
+            if isinstance(file_stream_or_path, str):
+                file_path = file_stream_or_path
+                mime_type, _ = mimetypes.guess_type(file_path)
+                media = MediaFileUpload(file_path, mimetype=mime_type, resumable=True)
+            else:
+                # 파일 스트림으로부터 업로드하는 경우
+                file_stream = file_stream_or_path
+                mime_type = file_stream.content_type  # Flask의 request.files['file'].content_type에서 MIME 타입을 얻을 수 있습니다.
+                media = MediaIoBaseUpload(file_stream, mimetype=mime_type, resumable=True)
+
+            if mime_type is None:
+                mime_type = 'application/octet-stream'
+
+            file_metadata = {'name': file_name, 'parents': [folder_id]}
+
+            try:
+                file = service.files().create(body=file_metadata, media_body=media, fields='id', supportsAllDrives=True).execute()
+                print(f'File ID: {file.get("id")}')
+                return file.get('id')
+            except HttpError as error:
+                print(f'An error occurred: {error}')
+                return None
 
     # ref: https://developers.google.com/drive/api/guides/delete
     def delete_file_or_folder(self, file_id):
