@@ -226,4 +226,5 @@ manager.export_file('your-google-docs-file-id')
     - https://developers.google.com/drive/api/guides/about-sdk
     - https://developers.google.com/drive/api/quickstart/python
     - https://developers.google.com/drive/api/guides/about-files
+    - https://console.cloud.google.com/apis/credentials // Get google_api_credential_client_secret.json 
     - ...
