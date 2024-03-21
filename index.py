@@ -79,6 +79,7 @@ class GoogleDriveManager:
     # ref: 
     # - https://developers.google.com/drive/api/guides/manage-uploads
     # - https://developers.google.com/drive/api/guides/manage-sharing // share
+
     def upload_file(self, file_stream_or_path, file_name, folder_id):
             """
             파일 또는 파일 스트림을 Google 드라이브에 업로드
@@ -89,6 +90,40 @@ class GoogleDriveManager:
             Returns:
                 str: 업로드 된 파일의 ID.
             """
+        service = self.create_service()
+
+        # 파일 경로로부터 업로드하는 경우
+        if isinstance(file_stream_or_path, str):
+            file_path = file_stream_or_path
+            mime_type, _ = mimetypes.guess_type(file_path)
+            media = MediaFileUpload(file_path, mimetype=mime_type, resumable=True)
+
+        # Flask의 FileStorage 객체 또는 Django의 UploadedFile 객체일 경우
+        elif hasattr(file_stream_or_path, 'read'):
+            # MIME 타입을 .content_type 또는 .mimetype 속성에서 가져옵니다.
+            mime_type = getattr(file_stream_or_path, 'content_type', 
+                                getattr(file_stream_or_path, 'mimetype', 'application/octet-stream'))
+            media = MediaIoBaseUpload(file_stream_or_path, mimetype=mime_type, resumable=True)
+
+        # 바이트 스트림 (io.BytesIO 객체)일 경우
+        elif isinstance(file_stream_or_path, io.BytesIO):
+            mime_type = 'application/octet-stream'  # 이 예시에서는 일반적인 바이너리 타입을 사용합니다.
+            media = MediaIoBaseUpload(file_stream_or_path, mimetype=mime_type, resumable=True)
+
+        else:
+            raise ValueError("Unsupported file type")
+
+        file_metadata = {'name': file_name, 'parents': [folder_id]}
+
+        try:
+            file = service.files().create(body=file_metadata, media_body=media, fields='id', supportsAllDrives=True).execute()
+            return file.get('id')
+        except Exception as error:  # 구체적인 예외 유형에 따라 수정할 수 있습니다.
+            print(f'An error occurred: {error}')
+            return None
+    """ Deprecated
+    def upload_file(self, file_stream_or_path, file_name, folder_id):
+
             service = self.create_service()
 
             # 파일 경로로부터 업로드하는 경우
@@ -114,6 +149,7 @@ class GoogleDriveManager:
             except HttpError as error:
                 print(f'An error occurred: {error}')
                 return None
+      """      
 
     # ref: https://developers.google.com/drive/api/guides/delete
     def delete_file_or_folder(self, file_id):
